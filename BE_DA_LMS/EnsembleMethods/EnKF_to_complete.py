@@ -42,7 +42,7 @@ exp_length = 10.0   # Experiment duration (time unit)
 # Data assimilation parameters
 sigmaB = 2.0       # Initial background error std
 sigmaR = 1.0       # Observation error std
-Ne = 100           # Number of members
+Ne = 100          # Number of members
 Ndt = 4            # Number of model integration between two data assimilations
 # The period between two assimilations is thus dt_ad = Ndt*dt_model
 Nc = int(exp_length/(Ndt*dt_model))  # Number of cycles
@@ -75,11 +75,11 @@ plot_timestep = 5                     # Timestep to show
 # Boolean to plot the truth trajectory based on the Lorenz-95 model
 plot_model_trajectory = False
 # Boolean to plot all states coordinates and their DA estimation at the i-th timestep
-plot_state_variables = True
+plot_state_variables = False
 # Boolean to plot the evolution of the truth, background and analysis of the j-th state component
-plot_data_assimilation_cycles = True
+plot_data_assimilation_cycles = False
 # Boolean to plot the evolution of the background ensemble spread for the j-th state component
-plot_local_ensemble_spread = True
+plot_local_ensemble_spread = False
 # Boolean to plot the evolution of the Root Mean Square Error (RMSE) of the state estimation
 plot_error_evolution = True
 # Boolean to plot the last bht and hbht matrices
