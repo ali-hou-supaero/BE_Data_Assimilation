@@ -179,19 +179,19 @@ for k in range(Nc):  # Loop over the cycles
     # Compute the mean and anomaly of the current ensemble
     # Use np.mean(., axis=1) for averaging over the second dimension.
     # Use broadcasting with np.new_axis to add arrays of different sizes.
-    xb_mean[k] =
-    Ab =
+    xb_mean[k] = np.mean(Eb, axis=1)
+    Ab = Eb - xb_mean[k][:, np.newaxis]
     # Storage for visualization
     # Save the spread of the background ensemble
     std_xb[k] = np.std(Eb, axis=1)
 
     # Map the ensemble members to the observation space using the observation operator H
     for i in range(Ne):
-        Z[:, i] =
+        Z[:, i] = H(Eb[:, i])
 
    # Compute Z_mean the mean of H(xb) and A0 its anomaly (Ao = [Z_1 - Z_mean, Z_2 - Z_mean, ..., Z_Ne - Z_mean])
-    Z_mean =
-    Ao =
+    Z_mean = np.mean(Z, axis=1)
+    Ao = Z - Z_mean[:, np.newaxis]
 
     # Compute the Kalman Gain using covariance estimation
     # K = BH^T(HBH^T+R)^(-1)
@@ -200,8 +200,8 @@ for k in range(Nc):  # Loop over the cycles
     # Use np.dot(A, B.T) to multiply the matrix A with the matrix B transpose
     # Use np.linalg.inv(A) to compute A^(-1)
     # Use empirical covariance estimation with anomalies matrixes Ab and Ao (see tutorial notes)
-    BHt =
-    HBHt =    # Use empirical covariance estimation with anomalies matrixes
+    BHt = np.dot(Ab, Ao.T) / (Ne - 1)
+    HBHt = np.dot(Ao, Ao.T) / (Ne - 1) + R
 
     if apply_localization:
         # To plot every n cycles only: plot=(k%n == 0)
@@ -209,13 +209,13 @@ for k in range(Nc):  # Loop over the cycles
         BHt = localization.localize_BHt(BHt, plot=False)
 
     # Kalmain gain estimation
-    K =
+    K = np.dot(BHt, np.linalg.inv(HBHt))
 
     # Produce an ensemble of perturbed observations from the real obs y
-    Y =       # Same method as the background initial ensemble sampling
+    Y = y[k][:, np.newaxis] + sigmaR * rng.standard_normal((No, Ne))
 
     # Compute the analysis of each ensemble members
-    Ea =      # Analysis update (see EnKF Algorithm)
+    Ea = Eb + K @ (Y - Z)
     xa_mean[k] = np.mean(Ea, axis=1)
 
     if apply_inflation:
@@ -227,7 +227,7 @@ for k in range(Nc):  # Loop over the cycles
         for i in range(Ne):
             # For each ensemble forecast the system evolution with M(., Ndt) for the next cycle
             # This part can be easily parallelized
-            Eb[:, i] =  # Same method as for the true state trajectory generation
+            Eb[:, i] = model.traj(Ea[:, i], Ndt)
 
 # =============================================================================
 # End of EnKF algorithm (nothing to complete afterwards)
