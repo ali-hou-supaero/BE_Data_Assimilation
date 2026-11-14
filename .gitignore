@@ -1,0 +1,7 @@
+# Python generated files and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.env
